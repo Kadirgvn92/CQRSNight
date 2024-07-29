@@ -1,6 +1,8 @@
-﻿namespace CQRSNight.CQRS.Commands.CategoryCommands;
+﻿using MediatR;
 
-public class CreateCategoryCommand
+namespace CQRSNight.CQRS.Commands.CategoryCommands;
+
+public class CreateCategoryCommand : IRequest
 {
     public string CategoryName { get; set; }
 }

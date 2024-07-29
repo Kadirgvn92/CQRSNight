@@ -1,22 +1,29 @@
-﻿using CQRSNight.CQRS.Results.CategoryResults;
+﻿using CQRSNight.CQRS.Queries.CategoryQueries;
+using CQRSNight.CQRS.Results.CategoryResults;
+using CQRSNight.Entity.Concrete;
 using CQRSNight.Entity.Context;
+using CQRSNight.Repository.GenericRepository;
+using MediatR;
 
 namespace CQRSNight.CQRS.Handlers.CategoryHandlers;
 
-public class GetCategoryQueryHandler
+public class GetCategoryQueryHandler : IRequestHandler<GetCategoryQuery, List<GetCategoryQueryResult>>
 {
-    private readonly CQRSContext _context;
+    private readonly IRepository<Category> _repository;
 
-    public GetCategoryQueryHandler(CQRSContext context)
+    public GetCategoryQueryHandler(IRepository<Category> repository)
     {
-        _context = context;
+        _repository = repository;
     }
-    public List<GetCategoryQueryResult> Handle()
+
+    public async Task<List<GetCategoryQueryResult>> Handle(GetCategoryQuery request, CancellationToken cancellationToken)
     {
-        var values = _context.Categories.Select(x => new GetCategoryQueryResult
+        var categories = await _repository.GetAllAsync();
+
+        return categories.Select(c => new GetCategoryQueryResult
         {
-            CategoryId = x.CategoryId,
+            CategoryId = c.CategoryId,
+            CategoryName = c.CategoryName,
         }).ToList();
-        return values;
     }
 }

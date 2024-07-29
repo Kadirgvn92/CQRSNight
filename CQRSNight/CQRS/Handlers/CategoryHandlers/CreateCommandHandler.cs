@@ -1,23 +1,25 @@
 ﻿using CQRSNight.CQRS.Commands.CategoryCommands;
 using CQRSNight.Entity.Concrete;
 using CQRSNight.Entity.Context;
+using CQRSNight.Repository.GenericRepository;
+using MediatR;
 
 namespace CQRSNight.CQRS.Handlers.CategoryHandlers;
 
-public class CreateCommandHandler
+public class CreateCommandHandler : IRequestHandler<CreateCategoryCommand>
 {
-    private readonly CQRSContext _context;
+    private readonly IRepository<Category> _categoryRepository;
 
-    public CreateCommandHandler(CQRSContext context)
+    public CreateCommandHandler(IRepository<Category> categoryRepository)
     {
-        _context = context;
+        _categoryRepository = categoryRepository;
     }
-    public void Handle(CreateCategoryCommand command)
+
+    public async Task Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
-        _context.Categories.Add(new Category
+        await _categoryRepository.CreateAsync(new Category
         {
-            CategoryName = command.CategoryName,
+            CategoryName = request.CategoryName,
         });
-        _context.SaveChanges();
     }
 }
