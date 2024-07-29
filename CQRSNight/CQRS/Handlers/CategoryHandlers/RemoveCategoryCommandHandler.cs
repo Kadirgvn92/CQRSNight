@@ -1,23 +1,23 @@
 ﻿using CQRSNight.CQRS.Commands.CategoryCommands;
+using CQRSNight.Entity.Concrete;
 using CQRSNight.Entity.Context;
+using CQRSNight.Repository.GenericRepository;
+using MediatR;
 
 namespace CQRSNight.CQRS.Handlers.CategoryHandlers;
 
-public class RemoveCategoryCommandHandler
+public class RemoveCategoryCommandHandler : IRequestHandler<RemoveCategoryCommand>  
 {
-    private readonly CQRSContext _context;
+    private readonly IRepository<Category> _categoryRepository;
 
-    public RemoveCategoryCommandHandler(CQRSContext context)
+    public RemoveCategoryCommandHandler(IRepository<Category> categoryRepository)
     {
-        _context = context;
+        _categoryRepository = categoryRepository;
     }
-    public void Handle(RemoveCategoryCommand command)
+
+    public async Task Handle(RemoveCategoryCommand request, CancellationToken cancellationToken)
     {
-        var values = _context.Categories.Find(command.CategoryId);
-        if (values != null)
-        {
-            _context.Categories.Remove(values);
-            _context.SaveChanges();
-        }
+        var values = await _categoryRepository.GetByIDAsync(request.Id);
+        await _categoryRepository.DeleteAsync(values);
     }
 }
